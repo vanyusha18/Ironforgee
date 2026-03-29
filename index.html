@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IronForge – Gym Essentials</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --black:#0a0a0a;--dark:#111111;--card:#181818;--border:#2a2a2a;
+  --red:#e63329;--red2:#ff4a3d;--gold:#f5a623;
+  --white:#f5f5f0;--muted:#888;--light:#ccc;
+  --font-display:'Bebas Neue',sans-serif;
+  --font-body:'Barlow',sans-serif;
+  --font-cond:'Barlow Condensed',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--black);color:var(--white);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
+.page{display:none;min-height:100vh}
+.page.active{display:flex;flex-direction:column}
+
+/* ===== BUTTONS ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;border:none;cursor:pointer;font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;border-radius:2px}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(230,51,41,.4)}
+.btn-outline{background:transparent;color:var(--white);border:2px solid var(--white)}
+.btn-outline:hover{background:var(--white);color:var(--black)}
+.btn-gold{background:var(--gold);color:var(--black)}
+.btn-gold:hover{background:#ffc040;transform:translateY(-2px)}
+.btn-dark{background:var(--card);color:var(--white);border:1px solid var(--border)}
+.btn-dark:hover{border-color:var(--red);color:var(--red)}
+.btn-sm{padding:8px 18px;font-size:13px}
+.btn-full{width:100%}
+
+/* ===== INPUTS ===== */
+.input-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.input-group label{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.input-group input,.input-group select,.input-group textarea{background:#1a1a1a;border:1px solid var(--border);color:var(--white);padding:12px 16px;font-family:var(--font-body);font-size:15px;border-radius:2px;outline:none;transition:border-color .2s;width:100%}
+.input-group input:focus,.input-group select:focus,.input-group textarea:focus{border-color:var(--red)}
+.input-group textarea{resize:vertical;min-height:80px}
+
+/* ===== ALERTS ===== */
+.alert{padding:12px 16px;border-radius:2px;font-size:14px;margin-bottom:16px;display:none}
+.alert.show{display:block}
+.alert-error{background:rgba(230,51,41,.15);border:1px solid var(--red);color:#ff8a82}
+.alert-success{background:rgba(34,197,94,.1);border:1px solid #22c55e;color:#4ade80}
+
+/* ==============================
+   PAGE 1 – SPLASH
+============================== */
+#page-splash{
+  background:#0a0a0a;
+  position:relative;overflow:hidden;align-items:center;justify-content:center;flex-direction:column;
+}
+#page-splash::before{
+  content:'';position:absolute;inset:0;
+  background:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80') center/cover no-repeat;
+  opacity:.18;
+}
+#page-splash::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 0%,var(--black) 80%);
+}
+.splash-content{position:relative;z-index:2;text-align:center;animation:splashIn .8s ease forwards}
+@keyframes splashIn{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.splash-logo{font-family:var(--font-display);font-size:clamp(64px,12vw,140px);line-height:.9;color:var(--white);letter-spacing:2px}
+.splash-logo span{color:var(--red)}
+.splash-tagline{font-family:var(--font-cond);font-size:clamp(14px,2.5vw,22px);letter-spacing:6px;color:var(--muted);margin:16px 0 40px;text-transform:uppercase}
+.splash-img-label{margin-top:24px;font-size:13px;color:var(--muted);letter-spacing:2px}
+.iron-bar{width:60px;height:3px;background:var(--red);margin:0 auto 32px;animation:barGrow 1s ease .4s both}
+@keyframes barGrow{from{width:0}to{width:60px}}
+
+/* ==============================
+   PAGE 2 – AUTH CHOICE
+============================== */
+#page-auth{align-items:center;justify-content:center;background:var(--dark);position:relative;overflow:hidden}
+#page-auth::before{
+  content:'';position:absolute;inset:0;
+  background:url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1400&q=80') center/cover no-repeat;
+  opacity:.08;
+}
+.auth-box{position:relative;z-index:2;text-align:center;max-width:420px;width:90%}
+.auth-box h1{font-family:var(--font-display);font-size:56px;letter-spacing:3px;margin-bottom:8px}
+.auth-box p{color:var(--muted);margin-bottom:40px;font-size:15px}
+.auth-btns{display:flex;flex-direction:column;gap:14px}
+
+/* ==============================
+   PAGE 3 – LOGIN
+============================== */
+#page-login,#page-register{align-items:center;justify-content:center;background:var(--dark)}
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:48px;max-width:460px;width:90%;position:relative}
+.form-card h2{font-family:var(--font-display);font-size:44px;letter-spacing:2px;margin-bottom:6px}
+.form-card .sub{color:var(--muted);font-size:14px;margin-bottom:32px}
+.form-link{color:var(--red);cursor:pointer;text-decoration:underline}
+.back-link{color:var(--muted);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;margin-bottom:24px;transition:color .2s}
+.back-link:hover{color:var(--white)}
+
+/* ==============================
+   HOME – HEADER
+============================== */
+.home-header{background:var(--dark);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-logo{font-family:var(--font-display);font-size:32px;letter-spacing:2px;color:var(--white)}
+.header-logo span{color:var(--red)}
+.header-right{display:flex;align-items:center;gap:16px}
+.avatar-btn{display:flex;align-items:center;gap:10px;background:none;border:none;cursor:pointer;color:var(--white)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);font-weight:700;font-size:16px}
+.avatar-name{font-size:14px;font-weight:500}
+.cart-btn{background:none;border:1px solid var(--border);padding:8px 16px;border-radius:2px;color:var(--white);cursor:pointer;display:flex;align-items:center;gap:8px;font-family:var(--font-cond);font-weight:700;letter-spacing:1px;font-size:14px;transition:all .2s}
+.cart-btn:hover{border-color:var(--red);color:var(--red)}
+.cart-count{background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+/* ==============================
+   HOME – HERO
+============================== */
+.home-hero{
+  height:380px;position:relative;overflow:hidden;
+  background:url('https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=1600&q=80') center/cover no-repeat;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;
+}
+.home-hero::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,.65)}
+.hero-text{position:relative;z-index:2}
+.hero-text h1{font-family:var(--font-display);font-size:clamp(48px,8vw,96px);letter-spacing:4px;line-height:.95}
+.hero-text h1 span{color:var(--red)}
+.hero-text p{font-family:var(--font-cond);letter-spacing:4px;color:var(--muted);font-size:15px;margin-top:12px;text-transform:uppercase}
+
+/* ==============================
+   HOME – CATEGORIES
+============================== */
+.section{padding:60px 24px;max-width:1400px;margin:0 auto;width:100%}
+.section-title{font-family:var(--font-display);font-size:52px;letter-spacing:3px;margin-bottom:8px}
+.section-title span{color:var(--red)}
+.section-sub{color:var(--muted);font-size:14px;letter-spacing:2px;text-transform:uppercase;margin-bottom:40px}
+.category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.category-card{
+  position:relative;height:260px;border-radius:4px;overflow:hidden;cursor:pointer;
+  transition:transform .3s,box-shadow .3s;border:1px solid var(--border);
+}
+.category-card:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(0,0,0,.5);border-color:var(--red)}
+.category-card img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.category-card:hover img{transform:scale(1.05)}
+.category-card::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 60%)}
+.cat-info{position:absolute;bottom:0;left:0;right:0;padding:24px;z-index:2}
+.cat-info h3{font-family:var(--font-display);font-size:32px;letter-spacing:2px}
+.cat-info p{color:var(--muted);font-size:13px;margin-top:4px}
+.cat-badge{position:absolute;top:16px;right:16px;background:var(--red);color:#fff;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:2px;z-index:2;text-transform:uppercase}
+
+/* ==============================
+   SUPPLEMENT TYPES PAGE
+============================== */
+.types-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.type-card{
+  background:var(--card);border:1px solid var(--border);border-radius:4px;
+  padding:32px 20px;text-align:center;cursor:pointer;transition:all .25s;
+}
+.type-card:hover{border-color:var(--red);transform:translateY(-4px)}
+.type-icon{font-size:48px;margin-bottom:16px}
+.type-card h3{font-family:var(--font-cond);font-size:18px;font-weight:700;letter-spacing:1px}
+.type-card p{color:var(--muted);font-size:12px;margin-top:6px}
+
+/* ==============================
+   PRODUCTS GRID
+============================== */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.product-card{
+  background:var(--card);border:1px solid var(--border);border-radius:4px;
+  overflow:hidden;transition:all .25s;cursor:pointer;
+}
+.product-card:hover{border-color:var(--red);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.product-img{height:200px;overflow:hidden;background:#222}
+.product-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.product-card:hover .product-img img{transform:scale(1.07)}
+.product-info{padding:20px}
+.product-brand{font-size:11px;letter-spacing:2px;color:var(--red);text-transform:uppercase;font-weight:700;margin-bottom:4px}
+.product-name{font-family:var(--font-cond);font-size:18px;font-weight:700;margin-bottom:6px;line-height:1.2}
+.product-price{font-family:var(--font-display);font-size:28px;color:var(--gold);letter-spacing:1px}
+.product-rating{color:#f5a623;font-size:13px;margin-top:4px}
+.product-actions{display:flex;gap:10px;margin-top:16px}
+.product-actions .btn{flex:1;padding:10px 12px;font-size:12px}
+
+/* ==============================
+   PRODUCT DETAIL
+============================== */
+.detail-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;padding:40px 24px;max-width:1200px;margin:0 auto}
+@media(max-width:768px){.detail-layout{grid-template-columns:1fr}}
+.detail-img-wrap{border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.detail-img-wrap img{width:100%;object-fit:cover;max-height:480px}
+.detail-info h1{font-family:var(--font-display);font-size:52px;letter-spacing:2px;line-height:.95;margin-bottom:8px}
+.detail-brand{font-size:12px;letter-spacing:3px;color:var(--red);text-transform:uppercase;font-weight:700;margin-bottom:16px}
+.detail-price{font-family:var(--font-display);font-size:64px;color:var(--gold);margin-bottom:24px}
+.detail-specs{border-top:1px solid var(--border);padding-top:24px;margin-bottom:24px}
+.spec-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.spec-row .label{color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;font-size:12px}
+.detail-btns{display:flex;gap:12px;flex-wrap:wrap}
+
+/* ==============================
+   CART PAGE
+============================== */
+.cart-layout{display:grid;grid-template-columns:1fr 360px;gap:32px;max-width:1200px;margin:0 auto;padding:40px 24px}
+@media(max-width:768px){.cart-layout{grid-template-columns:1fr}}
+.cart-item{display:flex;gap:20px;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:16px;align-items:center}
+.cart-item-img{width:80px;height:80px;border-radius:2px;overflow:hidden;flex-shrink:0}
+.cart-item-img img{width:100%;height:100%;object-fit:cover}
+.cart-item-info{flex:1}
+.cart-item-name{font-family:var(--font-cond);font-size:16px;font-weight:700}
+.cart-item-brand{font-size:12px;color:var(--red);letter-spacing:1px}
+.cart-item-price{font-family:var(--font-display);font-size:24px;color:var(--gold)}
+.qty-ctrl{display:flex;align-items:center;gap:12px;margin-top:8px}
+.qty-btn{background:var(--border);border:none;color:var(--white);width:28px;height:28px;border-radius:2px;cursor:pointer;font-size:16px;transition:background .2s}
+.qty-btn:hover{background:var(--red)}
+.qty-num{font-family:var(--font-cond);font-size:18px;font-weight:700;min-width:24px;text-align:center}
+.remove-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:2px;cursor:pointer;font-size:12px;transition:all .2s}
+.remove-btn:hover{border-color:var(--red);color:var(--red)}
+.order-summary{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:28px;position:sticky;top:80px}
+.order-summary h3{font-family:var(--font-display);font-size:32px;letter-spacing:2px;margin-bottom:24px}
+.summary-row{display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px}
+.summary-row.total{border-top:1px solid var(--border);padding-top:16px;margin-top:8px;font-family:var(--font-cond);font-size:20px;font-weight:700}
+.summary-row.total .val{color:var(--gold)}
+
+/* ==============================
+   ADDRESS / PAYMENT
+============================== */
+.checkout-wrap{max-width:800px;margin:0 auto;padding:40px 24px}
+.checkout-wrap h1{font-family:var(--font-display);font-size:56px;letter-spacing:2px;margin-bottom:8px}
+.checkout-wrap .sub{color:var(--muted);font-size:14px;margin-bottom:36px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+.form-full{grid-column:1/-1}
+.payment-detail{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:24px;margin-bottom:24px}
+.payment-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.payment-row:last-child{border:none}
+.payment-row .label{color:var(--muted)}
+.payment-total{font-family:var(--font-display);font-size:36px;color:var(--gold);text-align:center;margin:20px 0}
+
+/* ==============================
+   PROFILE PAGE
+============================== */
+.profile-wrap{max-width:900px;margin:0 auto;padding:40px 24px}
+.profile-header{display:flex;align-items:center;gap:24px;margin-bottom:40px;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:32px}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:40px;flex-shrink:0}
+.profile-name{font-family:var(--font-display);font-size:40px;letter-spacing:2px}
+.profile-email{color:var(--muted);font-size:14px}
+.profile-sections{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:600px){.profile-sections{grid-template-columns:1fr}}
+.profile-section{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:24px}
+.profile-section h3{font-family:var(--font-cond);font-size:18px;font-weight:700;letter-spacing:1px;margin-bottom:16px;color:var(--muted);text-transform:uppercase}
+.profile-field{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.profile-field:last-child{border:none}
+.profile-field .key{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.orders-list{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.order-item{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;display:flex;justify-content:space-between;align-items:center}
+.order-item .order-id{font-family:var(--font-cond);font-weight:700;font-size:14px;color:var(--muted)}
+.order-item .order-total{font-family:var(--font-display);font-size:24px;color:var(--gold)}
+.order-badge{background:rgba(34,197,94,.15);border:1px solid #22c55e;color:#4ade80;font-size:11px;font-family:var(--font-cond);font-weight:700;letter-spacing:1px;padding:3px 10px;border-radius:2px;text-transform:uppercase}
+
+/* ==============================
+   SUCCESS
+============================== */
+.success-wrap{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px}
+.success-icon{font-size:80px;margin-bottom:24px;animation:pop .5s ease}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.success-wrap h1{font-family:var(--font-display);font-size:64px;letter-spacing:3px;margin-bottom:12px}
+.success-wrap p{color:var(--muted);font-size:16px;margin-bottom:40px}
+
+/* ==============================
+   MISC
+============================== */
+.page-header{background:var(--dark);border-bottom:1px solid var(--border);padding:24px;display:flex;align-items:center;gap:16px}
+.page-header h1{font-family:var(--font-display);font-size:40px;letter-spacing:2px}
+.breadcrumb{color:var(--muted);font-size:13px;letter-spacing:1px}
+.breadcrumb span{color:var(--white)}
+.empty-state{text-align:center;padding:80px 24px;color:var(--muted)}
+.empty-state .icon{font-size:64px;margin-bottom:16px}
+.empty-state h3{font-family:var(--font-cond);font-size:24px;font-weight:700;margin-bottom:8px;color:var(--white)}
+.tag{display:inline-block;background:rgba(230,51,41,.15);border:1px solid var(--red);color:var(--red);font-size:11px;font-family:var(--font-cond);font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:2px;text-transform:uppercase;margin-right:6px;margin-bottom:6px}
+.loading{text-align:center;padding:60px;color:var(--muted);font-family:var(--font-cond);letter-spacing:2px}
+.divider{border:none;border-top:1px solid var(--border);margin:24px 0}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid #22c55e;color:#4ade80;padding:14px 24px;border-radius:4px;font-family:var(--font-cond);font-weight:700;font-size:15px;letter-spacing:1px;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.error-toast{border-color:var(--red);color:#ff8a82}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--black)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--red)}
+
+/* Page-level layout helper */
+#page-home{flex-direction:column}
+#page-types,#page-products,#page-detail,#page-cart,#page-address,#page-payment,#page-profile{flex-direction:column}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- ==============================
+     PAGE 1 – SPLASH
+============================== -->
+<div id="page-splash" class="page active">
+  <div class="splash-content">
+    <div class="splash-logo">IRON<span>FORGE</span></div>
+    <div class="iron-bar"></div>
+    <div class="splash-tagline">Start Finding Your Gym Essentials</div>
+    <button class="btn btn-red" onclick="goto('page-auth')">⚡ ENTER – START SHOPPING</button>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 2 – AUTH CHOICE
+============================== -->
+<div id="page-auth" class="page">
+  <div class="auth-box">
+    <h1>WELCOME</h1>
+    <p>Choose how you'd like to continue</p>
+    <div class="auth-btns">
+      <button class="btn btn-red btn-full" onclick="goto('page-login')">🔑 LOGIN</button>
+      <button class="btn btn-outline btn-full" onclick="goto('page-register')">📋 REGISTER</button>
+      <button class="btn btn-dark btn-full" onclick="guestLogin()">👤 VISIT AS GUEST</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 3 – LOGIN
+============================== -->
+<div id="page-login" class="page">
+  <div style="padding:40px;max-width:460px;width:90%;margin:auto">
+    <span class="back-link" onclick="goto('page-auth')">← Back</span>
+    <div class="form-card" style="padding:40px 32px">
+      <h2>LOGIN</h2>
+      <p class="sub">Welcome back, warrior. <span class="form-link" onclick="goto('page-register')">Register instead</span></p>
+      <div id="login-alert" class="alert alert-error"></div>
+      <div class="input-group">
+        <label>Username / Email / Phone</label>
+        <input type="text" id="login-id" placeholder="Enter your identifier"/>
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="login-pwd" placeholder="Enter password"/>
+      </div>
+      <button class="btn btn-red btn-full" onclick="doLogin()" style="margin-top:8px">LOGIN →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 4 – REGISTER
+============================== -->
+<div id="page-register" class="page">
+  <div style="padding:40px;max-width:520px;width:90%;margin:auto">
+    <span class="back-link" onclick="goto('page-auth')">← Back</span>
+    <div class="form-card" style="padding:40px 32px">
+      <h2>REGISTER</h2>
+      <p class="sub">Join the forge. <span class="form-link" onclick="goto('page-login')">Login instead</span></p>
+      <div id="reg-alert" class="alert alert-error"></div>
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="reg-username" placeholder="Choose a username"/>
+      </div>
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="your@email.com"/>
+      </div>
+      <div class="input-group">
+        <label>Phone Number</label>
+        <input type="tel" id="reg-phone" placeholder="+91 00000 00000"/>
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="reg-pwd" placeholder="Min. 6 characters"/>
+      </div>
+      <div class="input-group">
+        <label>Date of Birth</label>
+        <input type="date" id="reg-dob"/>
+      </div>
+      <div class="input-group">
+        <label>Gender</label>
+        <select id="reg-gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
+      </div>
+      <button class="btn btn-red btn-full" onclick="doRegister()" style="margin-top:8px">CREATE ACCOUNT →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 5 – HOME
+============================== -->
+<div id="page-home" class="page">
+  <header class="home-header">
+    <div class="header-logo">IRON<span>FORGE</span></div>
+    <div class="header-right">
+      <button class="avatar-btn" onclick="goto('page-profile')">
+        <div class="avatar" id="header-avatar">?</div>
+        <span class="avatar-name" id="header-name">Guest</span>
+      </button>
+      <button class="cart-btn" onclick="goto('page-cart')">
+        🛒 CART <span class="cart-count" id="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="home-hero">
+    <div class="hero-text">
+      <h1>FORGE YOUR<br/><span>LEGACY</span></h1>
+      <p>Premium Gym Essentials — Delivered to You</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">SELECT YOUR <span>NEEDS</span></div>
+    <div class="section-sub">Choose a category to explore</div>
+    <div class="category-grid">
+      <div class="category-card" onclick="openCategory('supplements')">
+        <img src="https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600&q=80" alt="Supplements"/>
+        <div class="cat-badge">50+ Products</div>
+        <div class="cat-info">
+          <h3>SUPPLEMENTS</h3>
+          <p>Protein, Creatine, Pre-workout & more</p>
+        </div>
+      </div>
+      <div class="category-card" onclick="openCategory('workout')">
+        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80" alt="Workout"/>
+        <div class="cat-badge">20+ Products</div>
+        <div class="cat-info">
+          <h3>WORKOUT GEAR</h3>
+          <p>Dumbbells, Resistance Bands, Push-up Boards & more</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 6 – SUPPLEMENT TYPES
+============================== -->
+<div id="page-types" class="page">
+  <header class="home-header">
+    <div class="header-logo">IRON<span>FORGE</span></div>
+    <div class="header-right">
+      <button class="avatar-btn" onclick="goto('page-profile')"><div class="avatar" id="types-avatar">?</div></button>
+      <button class="cart-btn" onclick="goto('page-cart')">🛒 <span class="cart-count" id="types-cart-count">0</span></button>
+    </div>
+  </header>
+  <div class="page-header">
+    <span class="back-link" onclick="goto('page-home')">←</span>
+    <div>
+      <div class="breadcrumb">Home → <span id="types-breadcrumb">Supplements</span></div>
+      <h1 id="types-title">SUPPLEMENTS</h1>
+    </div>
+  </div>
+  <div class="section">
+    <div id="types-grid" class="types-grid"></div>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 7 – PRODUCTS LIST
+============================== -->
+<div id="page-products" class="page">
+  <header class="home-header">
+    <div class="header-logo">IRON<span>FORGE</span></div>
+    <div class="header-right">
+      <button class="avatar-btn" onclick="goto('page-profile')"><div class="avatar" id="prod-avatar">?</div></button>
+      <button class="cart-btn" onclick="goto('page-cart')">🛒 <span class="cart-count" id="prod-cart-count">0</span></button>
+    </div>
+  </header>
+  <div class="page-header">
+    <span class="back-link" id="prod-back-btn">←</span>
+    <div>
+      <div class="breadcrumb" id="prod-breadcrumb"></div>
+      <h1 id="prod-title">PRODUCTS</h1>
+    </div>
+  </div>
+  <div class="section">
+    <div id="products-grid" class="products-grid"></div>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 8 – PRODUCT DETAIL
+============================== -->
+<div id="page-detail" class="page">
+  <header class="home-header">
+    <div class="header-logo">IRON<span>FORGE</span></div>
+    <div class="header-right">
+      <button class="avatar-btn" onclick="goto('page-profile')"><div class="avatar" id="det-avatar">?</div></button>
+      <button class="cart-btn" onclick="goto('page-cart')">🛒 <span class="cart-count" id="det-cart-count">0</span></button>
+    </div>
+  </header>
+  <div class="page-header">
+    <span class="back-link" id="det-back-btn">←</span>
+    <div class="breadcrumb" id="det-breadcrumb"></div>
+  </div>
+  <div id="detail-content"></div>
+</div>
+
+<!-- ==============================
+     PAGE 9 – CART
+============================== -->
+<div id="page-cart" class="page">
+  <header class="home-header">
+    <div class="header-logo">IRON<span>FORGE</span></div>
+    <div class="header-right">
+      <button class="avatar-btn" onclick="goto('page-profile')"><div class="avatar" id="cart-avatar">?</div></button>
+      <button class="cart-btn" onclick="goto('page-cart')">🛒 <span class="cart-count" id="cart-page-count">0</span></button>
+    </div>
+  </header>
+  <div class="page-header">
+    <span class="back-link" onclick="history.back()">← Back</span>
+    <h1>MY CART</h1>
+  </div>
+  <div class="cart-layout">
+    <div id="cart-items"></div>
+    <div id="cart-summary"></div>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 10 – ADDRESS
+============================== -->
+<div id="page-address" class="page">
+  <header class="home-header">
+    <div class="header-logo">IRON<span>FORGE</span></div>
+  </header>
+  <div class="checkout-wrap">
+    <span class="back-link" onclick="goto('page-cart')">← Back to Cart</span>
+    <h1>DELIVERY ADDRESS</h1>
+    <p class="sub">Where should we send your order?</p>
+    <div id="addr-alert" class="alert alert-error"></div>
+    <div class="form-grid">
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="addr-name" placeholder="John Doe"/>
+      </div>
+      <div class="input-group">
+        <label>Phone Number</label>
+        <input type="tel" id="addr-phone" placeholder="+91 00000 00000"/>
+      </div>
+      <div class="input-group form-full">
+        <label>Address Line 1</label>
+        <input type="text" id="addr-line1" placeholder="House/Flat No, Street"/>
+      </div>
+      <div class="input-group form-full">
+        <label>Address Line 2</label>
+        <input type="text" id="addr-line2" placeholder="Area, Landmark (optional)"/>
+      </div>
+      <div class="input-group">
+        <label>City</label>
+        <input type="text" id="addr-city" placeholder="City"/>
+      </div>
+      <div class="input-group">
+        <label>State</label>
+        <input type="text" id="addr-state" placeholder="State"/>
+      </div>
+      <div class="input-group">
+        <label>PIN Code</label>
+        <input type="text" id="addr-pin" placeholder="000000"/>
+      </div>
+      <div class="input-group">
+        <label>Country</label>
+        <input type="text" id="addr-country" value="India"/>
+      </div>
+    </div>
+    <button class="btn btn-red" style="margin-top:8px" onclick="proceedToPayment()">PROCEED TO PAYMENT →</button>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 11 – PAYMENT
+============================== -->
+<div id="page-payment" class="page">
+  <header class="home-header">
+    <div class="header-logo">IRON<span>FORGE</span></div>
+  </header>
+  <div class="checkout-wrap">
+    <span class="back-link" onclick="goto('page-address')">← Back</span>
+    <h1>PAYMENT</h1>
+    <p class="sub">Review and complete your order</p>
+    <div id="payment-details"></div>
+    <div class="input-group">
+      <label>Select Payment Method</label>
+      <select id="pay-method">
+        <option>UPI / Google Pay / PhonePe</option>
+        <option>Credit Card / Debit Card</option>
+        <option>Net Banking</option>
+        <option>Cash on Delivery</option>
+        <option>EMI</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>UPI ID / Card Number</label>
+      <input type="text" id="pay-id" placeholder="Enter your payment details"/>
+    </div>
+    <button class="btn btn-gold btn-full" onclick="doPayment()" style="margin-top:8px;font-size:18px;padding:18px">💳 CONFIRM & PAY →</button>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE 12 – PROFILE
+============================== -->
+<div id="page-profile" class="page">
+  <header class="home-header">
+    <div class="header-logo">IRON<span>FORGE</span></div>
+    <div class="header-right">
+      <button class="cart-btn" onclick="goto('page-cart')">🛒 <span class="cart-count" id="prof-cart-count">0</span></button>
+    </div>
+  </header>
+  <div class="page-header">
+    <span class="back-link" onclick="goto('page-home')">← Home</span>
+    <h1>MY PROFILE</h1>
+  </div>
+  <div id="profile-content" style="padding:24px"></div>
+</div>
+
+<!-- ==============================
+     PAGE 13 – ORDER SUCCESS
+============================== -->
+<div id="page-success" class="page">
+  <header class="home-header">
+    <div class="header-logo">IRON<span>FORGE</span></div>
+  </header>
+  <div class="success-wrap">
+    <div class="success-icon">✅</div>
+    <h1>ORDER PLACED!</h1>
+    <p id="success-msg">Your order has been confirmed and is being processed.</p>
+    <button class="btn btn-red" onclick="goto('page-home')">← CONTINUE SHOPPING</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  DATABASE (localStorage simulation)
+// ============================================================
+const DB = {
+  getUsers(){ return JSON.parse(localStorage.getItem('ironforge_users')||'[]') },
+  saveUsers(u){ localStorage.setItem('ironforge_users',JSON.stringify(u)) },
+  getCart(){ return JSON.parse(localStorage.getItem('ironforge_cart')||'[]') },
+  saveCart(c){ localStorage.setItem('ironforge_cart',JSON.stringify(c)) },
+  getOrders(){ return JSON.parse(localStorage.getItem('ironforge_orders')||'[]') },
+  saveOrders(o){ localStorage.setItem('ironforge_orders',JSON.stringify(o)) },
+  getCurrentUser(){ return JSON.parse(localStorage.getItem('ironforge_current')||'null') },
+  setCurrentUser(u){ localStorage.setItem('ironforge_current',JSON.stringify(u)) },
+  clearCurrentUser(){ localStorage.removeItem('ironforge_current') },
+  getSavedAddresses(){ return JSON.parse(localStorage.getItem('ironforge_addresses')||'[]') },
+  saveAddress(a){
+    const list=this.getSavedAddresses();list.unshift(a);
+    if(list.length>5)list.pop();
+    localStorage.setItem('ironforge_addresses',JSON.stringify(list));
+  }
+};
+
+// ============================================================
+//  PRODUCT DATA
+// ============================================================
+const SUPPLEMENT_TYPES = [
+  {id:'whey',icon:'🥛',name:'Whey Protein',desc:'Fast-absorbing protein for muscle recovery'},
+  {id:'creatine',icon:'⚡',name:'Creatine',desc:'Boost strength and explosive power'},
+  {id:'preworkout',icon:'🔥',name:'Pre-Workout',desc:'Energy, focus and endurance amplifiers'},
+  {id:'bcaa',icon:'🧬',name:'BCAAs',desc:'Essential amino acids for muscle preservation'},
+  {id:'mass',icon:'💪',name:'Mass Gainer',desc:'High-calorie formula for serious bulk'},
+];
+
+const PRODUCTS = {
+  // ---- WHEY PROTEIN ----
+  whey:[
+    {id:'w1',brand:'MuscleBlaze',name:'Whey Protein Rich Chocolate',price:2699,weight:'1 kg',flavors:'Chocolate, Vanilla',protein:'25g per serve',servings:33,mfg:'Jan 2025',expiry:'Dec 2026',country:'India',calories:'131 kcal',ingredients:'Whey Concentrate, Cocoa, Sucralose',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80'},
+    {id:'w2',brand:'BigMuscles',name:'Whey Protein Premium Gold',price:3199,weight:'1 kg',flavors:'Chocolate, Strawberry',protein:'24g per serve',servings:30,mfg:'Feb 2025',expiry:'Jan 2027',country:'India',calories:'140 kcal',ingredients:'Whey Isolate, Milk Protein',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80'},
+    {id:'w3',brand:'Optimum Nutrition',name:'Gold Standard 100% Whey',price:4999,weight:'907g',flavors:'Double Rich Chocolate',protein:'24g per serve',servings:29,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'120 kcal',ingredients:'Whey Protein Isolate Blend',rating:'4.8⭐',img:'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&q=80'},
+    {id:'w4',brand:'MyProtein',name:'Impact Whey Protein',price:2199,weight:'1 kg',flavors:'Chocolate Smooth',protein:'21g per serve',servings:40,mfg:'Jan 2025',expiry:'Dec 2026',country:'UK',calories:'103 kcal',ingredients:'Whey Protein Concentrate',rating:'4.2⭐',img:'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&q=80'},
+    {id:'w5',brand:'Dymatize',name:'ISO100 Hydrolyzed Whey',price:5499,weight:'900g',flavors:'Gourmet Vanilla',protein:'25g per serve',servings:36,mfg:'Feb 2025',expiry:'Jan 2027',country:'USA',calories:'120 kcal',ingredients:'Hydrolyzed Whey Isolate',rating:'4.7⭐',img:'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=400&q=80'},
+    {id:'w6',brand:'GNC',name:'100% Whey Protein',price:3499,weight:'907g',flavors:'Chocolate Supreme',protein:'24g per serve',servings:24,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'130 kcal',ingredients:'Whey Protein Blend',rating:'4.1⭐',img:'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=400&q=80'},
+    {id:'w7',brand:'Cellucor',name:'WHEY Sport Protein',price:2899,weight:'820g',flavors:'Chocolate Chip Cookie',protein:'30g per serve',servings:27,mfg:'Jan 2025',expiry:'Dec 2026',country:'USA',calories:'160 kcal',ingredients:'Whey Protein Isolate, Concentrate',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?w=400&q=80'},
+    {id:'w8',brand:'HealthXP',name:'Elite Whey Protein',price:1899,weight:'1 kg',flavors:'Belgian Chocolate',protein:'25g per serve',servings:33,mfg:'Apr 2025',expiry:'Mar 2027',country:'India',calories:'128 kcal',ingredients:'Whey Concentrate, Digestive Enzymes',rating:'4.0⭐',img:'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&q=80'},
+    {id:'w9',brand:'Nakpro',name:'Perform Whey Protein',price:1699,weight:'1 kg',flavors:'Chocolate',protein:'24g per serve',servings:33,mfg:'Feb 2025',expiry:'Jan 2027',country:'India',calories:'122 kcal',ingredients:'Whey Concentrate, Whey Peptides',rating:'4.2⭐',img:'https://images.unsplash.com/photo-1536532184021-da5392b55da1?w=400&q=80'},
+    {id:'w10',brand:'BSN',name:'SYNTHA-6 Protein Powder',price:3999,weight:'1.32 kg',flavors:'Vanilla Ice Cream',protein:'22g per serve',servings:48,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'200 kcal',ingredients:'Multi-Phase Protein Matrix',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1544991936-9464fa57a2cd?w=400&q=80'},
+  ],
+  // ---- CREATINE ----
+  creatine:[
+    {id:'c1',brand:'MuscleBlaze',name:'Creatine Monohydrate Unflavoured',price:799,weight:'250g',flavors:'Unflavoured',protein:'–',servings:50,mfg:'Feb 2025',expiry:'Jan 2027',country:'India',calories:'0 kcal',ingredients:'Creatine Monohydrate 100%',rating:'4.6⭐',img:'https://images.unsplash.com/photo-1544991936-9464fa57a2cd?w=400&q=80'},
+    {id:'c2',brand:'Optimum Nutrition',name:'Micronized Creatine Powder',price:1499,weight:'300g',flavors:'Unflavoured',protein:'–',servings:60,mfg:'Jan 2025',expiry:'Dec 2026',country:'USA',calories:'0 kcal',ingredients:'Micronized Creatine Monohydrate',rating:'4.7⭐',img:'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&q=80'},
+    {id:'c3',brand:'MyProtein',name:'Creatine Monohydrate',price:699,weight:'250g',flavors:'Unflavoured',protein:'–',servings:50,mfg:'Mar 2025',expiry:'Feb 2027',country:'UK',calories:'0 kcal',ingredients:'Pure Creatine Monohydrate',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=400&q=80'},
+    {id:'c4',brand:'Cellucor',name:'COR Performance Creatine',price:1899,weight:'300g',flavors:'Unflavoured',protein:'–',servings:72,mfg:'Feb 2025',expiry:'Jan 2027',country:'USA',calories:'0 kcal',ingredients:'Creapure Creatine Monohydrate',rating:'4.8⭐',img:'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&q=80'},
+    {id:'c5',brand:'BigMuscles',name:'Creatine Micronized',price:599,weight:'200g',flavors:'Unflavoured',protein:'–',servings:40,mfg:'Jan 2025',expiry:'Dec 2026',country:'India',calories:'0 kcal',ingredients:'Creatine Monohydrate',rating:'4.1⭐',img:'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=400&q=80'},
+    {id:'c6',brand:'MuscleTech',name:'Platinum Creatine',price:1699,weight:'400g',flavors:'Unflavoured',protein:'–',servings:80,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'0 kcal',ingredients:'Ultra-Pure Creatine Monohydrate',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80'},
+    {id:'c7',brand:'Dymatize',name:'Micronized Creatine',price:1299,weight:'300g',flavors:'Unflavoured',protein:'–',servings:60,mfg:'Feb 2025',expiry:'Jan 2027',country:'USA',calories:'0 kcal',ingredients:'Micronized Creatine Monohydrate',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&q=80'},
+    {id:'c8',brand:'GNC',name:'AMP Amplified Creatine',price:2199,weight:'200g',flavors:'Unflavoured',protein:'–',servings:40,mfg:'Jan 2025',expiry:'Dec 2026',country:'USA',calories:'0 kcal',ingredients:'Creatine HCl, Monohydrate Blend',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80'},
+    {id:'c9',brand:'Nakpro',name:'Creatine Pure',price:499,weight:'200g',flavors:'Unflavoured',protein:'–',servings:40,mfg:'Apr 2025',expiry:'Mar 2027',country:'India',calories:'0 kcal',ingredients:'Creatine Monohydrate',rating:'4.0⭐',img:'https://images.unsplash.com/photo-1536532184021-da5392b55da1?w=400&q=80'},
+    {id:'c10',brand:'HealthXP',name:'Creatine Extreme',price:899,weight:'250g',flavors:'Unflavoured',protein:'–',servings:50,mfg:'Mar 2025',expiry:'Feb 2027',country:'India',calories:'0 kcal',ingredients:'Creatine Monohydrate, Vitamin B6',rating:'4.2⭐',img:'https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?w=400&q=80'},
+  ],
+  // ---- PRE-WORKOUT ----
+  preworkout:[
+    {id:'p1',brand:'Cellucor',name:'C4 Original Pre Workout',price:1999,weight:'195g',flavors:'Icy Blue Razz',protein:'–',servings:30,mfg:'Feb 2025',expiry:'Jan 2027',country:'USA',calories:'5 kcal',ingredients:'Beta-Alanine, Caffeine 150mg, Arginine',rating:'4.7⭐',img:'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&q=80'},
+    {id:'p2',brand:'MuscleBlaze',name:'Pre Workout Supplement',price:1499,weight:'250g',flavors:'Green Apple',protein:'–',servings:30,mfg:'Jan 2025',expiry:'Dec 2026',country:'India',calories:'10 kcal',ingredients:'L-Citrulline, Beta-Alanine, Caffeine 200mg',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80'},
+    {id:'p3',brand:'Optimum Nutrition',name:'Gold Standard Pre Workout',price:2499,weight:'300g',flavors:'Blueberry Lemonade',protein:'–',servings:30,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'10 kcal',ingredients:'Creatine, Caffeine 175mg, AstraGin',rating:'4.6⭐',img:'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&q=80'},
+    {id:'p4',brand:'MuscleTech',name:'VaporX5 Next Gen',price:2299,weight:'263g',flavors:'Fruit Punch Blast',protein:'–',servings:30,mfg:'Feb 2025',expiry:'Jan 2027',country:'USA',calories:'5 kcal',ingredients:'Beta-Alanine, L-Arginine, Caffeine 300mg',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&q=80'},
+    {id:'p5',brand:'MyProtein',name:'THE Pre Workout',price:1799,weight:'490g',flavors:'Blue Raspberry',protein:'–',servings:49,mfg:'Jan 2025',expiry:'Dec 2026',country:'UK',calories:'5 kcal',ingredients:'Caffeine 200mg, L-Tyrosine, Taurine',rating:'4.2⭐',img:'https://images.unsplash.com/photo-1544991936-9464fa57a2cd?w=400&q=80'},
+    {id:'p6',brand:'BSN',name:'N.O.-XPLODE Pre Workout',price:2799,weight:'395g',flavors:'Grape',protein:'–',servings:30,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'20 kcal',ingredients:'N.O. Alpha Fusion, Myogenic Matrix',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=400&q=80'},
+    {id:'p7',brand:'BigMuscles',name:'Ripped Extreme Pre Workout',price:999,weight:'200g',flavors:'Lemon Lime',protein:'–',servings:25,mfg:'Feb 2025',expiry:'Jan 2027',country:'India',calories:'5 kcal',ingredients:'Caffeine 180mg, BCAA, Beta-Alanine',rating:'4.0⭐',img:'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&q=80'},
+    {id:'p8',brand:'Dymatize',name:'PRE W.O. Pre Workout',price:2099,weight:'270g',flavors:'Watermelon',protein:'–',servings:30,mfg:'Jan 2025',expiry:'Dec 2026',country:'USA',calories:'10 kcal',ingredients:'Caffeine Anhydrous 300mg, L-Citrulline',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=400&q=80'},
+    {id:'p9',brand:'GNC',name:'AMP Gold Series Pre Workout',price:2599,weight:'220g',flavors:'Strawberry Kiwi',protein:'–',servings:30,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'10 kcal',ingredients:'CarnoSyn Beta-Alanine, Caffeine 200mg',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80'},
+    {id:'p10',brand:'HealthXP',name:'Ignite Pre Workout',price:1299,weight:'300g',flavors:'Tropical Punch',protein:'–',servings:30,mfg:'Apr 2025',expiry:'Mar 2027',country:'India',calories:'5 kcal',ingredients:'L-Arginine, Caffeine 150mg, Taurine',rating:'4.1⭐',img:'https://images.unsplash.com/photo-1536532184021-da5392b55da1?w=400&q=80'},
+  ],
+  // ---- BCAA ----
+  bcaa:[
+    {id:'b1',brand:'MuscleBlaze',name:'BCAA 6:1:1 Instant',price:1099,weight:'250g',flavors:'Watermelon',protein:'–',servings:31,mfg:'Feb 2025',expiry:'Jan 2027',country:'India',calories:'5 kcal',ingredients:'L-Leucine 6g, L-Isoleucine 1g, L-Valine 1g',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&q=80'},
+    {id:'b2',brand:'Optimum Nutrition',name:'Instantized BCAA Powder',price:1599,weight:'336g',flavors:'Blue Raspberry',protein:'–',servings:48,mfg:'Jan 2025',expiry:'Dec 2026',country:'USA',calories:'5 kcal',ingredients:'BCAA 2:1:1, Electrolytes',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80'},
+    {id:'b3',brand:'MyProtein',name:'BCAA Amino + Energy',price:999,weight:'250g',flavors:'Peach Mango',protein:'–',servings:50,mfg:'Mar 2025',expiry:'Feb 2027',country:'UK',calories:'10 kcal',ingredients:'BCAAs 2:1:1, Caffeine 75mg',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=400&q=80'},
+    {id:'b4',brand:'MuscleTech',name:'Amino Build Next Gen',price:1999,weight:'400g',flavors:'Grape',protein:'–',servings:50,mfg:'Feb 2025',expiry:'Jan 2027',country:'USA',calories:'5 kcal',ingredients:'BCAAs 8:1:1, Betaine Anhydrous',rating:'4.6⭐',img:'https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?w=400&q=80'},
+    {id:'b5',brand:'BigMuscles',name:'BCAA Xtreme',price:749,weight:'200g',flavors:'Cola',protein:'–',servings:25,mfg:'Jan 2025',expiry:'Dec 2026',country:'India',calories:'0 kcal',ingredients:'L-Leucine, L-Isoleucine, L-Valine',rating:'4.0⭐',img:'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&q=80'},
+    {id:'b6',brand:'Dymatize',name:'BCAA Complex 2200',price:1399,weight:'400g',flavors:'Capsule',protein:'–',servings:100,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'0 kcal',ingredients:'Vitamin B6, BCAA 2:1:1',rating:'4.2⭐',img:'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=400&q=80'},
+    {id:'b7',brand:'BSN',name:'Amino X BCAA Endurance',price:1799,weight:'435g',flavors:'Watermelon',protein:'–',servings:30,mfg:'Feb 2025',expiry:'Jan 2027',country:'USA',calories:'0 kcal',ingredients:'Micronized Amino Acids, 10g total',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1536532184021-da5392b55da1?w=400&q=80'},
+    {id:'b8',brand:'GNC',name:'Pro Performance BCAA',price:1299,weight:'300g',flavors:'Lemon Lime',protein:'–',servings:40,mfg:'Jan 2025',expiry:'Dec 2026',country:'USA',calories:'5 kcal',ingredients:'BCAA 2:1:1, Electrolyte Blend',rating:'4.1⭐',img:'https://images.unsplash.com/photo-1544991936-9464fa57a2cd?w=400&q=80'},
+    {id:'b9',brand:'Cellucor',name:'Alpha Amino BCAA',price:2099,weight:'381g',flavors:'Watermelon',protein:'–',servings:30,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'5 kcal',ingredients:'BCAA 2:1:1, Hydration Blend, l-Glutamine',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&q=80'},
+    {id:'b10',brand:'HealthXP',name:'BCAA Recover Pro',price:899,weight:'250g',flavors:'Orange',protein:'–',servings:33,mfg:'Apr 2025',expiry:'Mar 2027',country:'India',calories:'5 kcal',ingredients:'BCAA 2:1:1, Taurine, Vit C',rating:'4.0⭐',img:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80'},
+  ],
+  // ---- MASS GAINER ----
+  mass:[
+    {id:'m1',brand:'MuscleBlaze',name:'Super Gainer XXL',price:1999,weight:'3 kg',flavors:'Chocolate',protein:'31.5g per serve',servings:30,mfg:'Feb 2025',expiry:'Jan 2027',country:'India',calories:'606 kcal',ingredients:'Carbs 109g, Whey Protein, Creatine',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=400&q=80'},
+    {id:'m2',brand:'BigMuscles',name:'Real Mass Gainer',price:2499,weight:'3 kg',flavors:'Chocolate Fudge',protein:'30g per serve',servings:24,mfg:'Jan 2025',expiry:'Dec 2026',country:'India',calories:'596 kcal',ingredients:'Carbohydrate Blend, Whey Protein',rating:'4.1⭐',img:'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&q=80'},
+    {id:'m3',brand:'Optimum Nutrition',name:'Serious Mass Protein Powder',price:5499,weight:'2.72 kg',flavors:'Vanilla',protein:'50g per serve',servings:16,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'1250 kcal',ingredients:'Protein Blend, Complex Carbs, Vitamins',rating:'4.7⭐',img:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80'},
+    {id:'m4',brand:'MuscleTech',name:'Mass Tech Elite Mass Gainer',price:4499,weight:'3.18 kg',flavors:'Triple Chocolate',protein:'80g per serve',servings:14,mfg:'Feb 2025',expiry:'Jan 2027',country:'USA',calories:'840 kcal',ingredients:'Protein Matrix, Mass Complex Carbs',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&q=80'},
+    {id:'m5',brand:'MyProtein',name:'Hard Gainer Extreme',price:2799,weight:'2.5 kg',flavors:'Chocolate Smooth',protein:'30g per serve',servings:25,mfg:'Jan 2025',expiry:'Dec 2026',country:'UK',calories:'388 kcal',ingredients:'Oat Flour, Whey Protein, Creatine',rating:'4.2⭐',img:'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&q=80'},
+    {id:'m6',brand:'GNC',name:'Pro Performance Bulk 1340',price:3999,weight:'2.27 kg',flavors:'Vanilla Custard',protein:'50g per serve',servings:16,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'1340 kcal',ingredients:'Protein Blend, Fast & Slow Carbs',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=400&q=80'},
+    {id:'m7',brand:'BSN',name:'TRUE-MASS Ultra Premium',price:4999,weight:'2.64 kg',flavors:'Strawberry Milkshake',protein:'46g per serve',servings:21,mfg:'Feb 2025',expiry:'Jan 2027',country:'USA',calories:'700 kcal',ingredients:'Multi-Source Protein, Waxy Maize Starch',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?w=400&q=80'},
+    {id:'m8',brand:'HealthXP',name:'Hyper Mass 5000',price:1799,weight:'3 kg',flavors:'Chocolate',protein:'32g per serve',servings:25,mfg:'Jan 2025',expiry:'Dec 2026',country:'India',calories:'567 kcal',ingredients:'Protein Blend, Dextrose, Fructose',rating:'4.0⭐',img:'https://images.unsplash.com/photo-1536532184021-da5392b55da1?w=400&q=80'},
+    {id:'m9',brand:'Nakpro',name:'Mass Gainer 3000',price:1499,weight:'2 kg',flavors:'Chocolate',protein:'25g per serve',servings:22,mfg:'Apr 2025',expiry:'Mar 2027',country:'India',calories:'476 kcal',ingredients:'Carb Blend, Whey Protein',rating:'3.9⭐',img:'https://images.unsplash.com/photo-1544991936-9464fa57a2cd?w=400&q=80'},
+    {id:'m10',brand:'Dymatize',name:'Super Mass Gainer',price:3599,weight:'2.72 kg',flavors:'Rich Chocolate',protein:'52g per serve',servings:16,mfg:'Mar 2025',expiry:'Feb 2027',country:'USA',calories:'1280 kcal',ingredients:'Protein Blend, Carb Complex, BCAAs',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80'},
+  ],
+  // ---- WORKOUT GEAR ----
+  workout:[
+    {id:'g1',brand:'Kore',name:'PVC Adjustable Dumbbells Set (10kg)',price:1299,weight:'10kg',flavors:'–',protein:'–',servings:'–',mfg:'Jan 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'PVC Coating, Iron Core',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400&q=80'},
+    {id:'g2',brand:'Boldfit',name:'Push Up Board 11-in-1',price:699,weight:'1.2kg',flavors:'–',protein:'–',servings:'–',mfg:'Feb 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'High-grade ABS Plastic',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80'},
+    {id:'g3',brand:'Generic',name:'Resistance Bands Set (5 levels)',price:499,weight:'0.5kg',flavors:'–',protein:'–',servings:'–',mfg:'Mar 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Natural Latex',rating:'4.2⭐',img:'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&q=80'},
+    {id:'g4',brand:'Aurion',name:'Skipping Rope Speed Jump Rope',price:399,weight:'0.3kg',flavors:'–',protein:'–',servings:'–',mfg:'Jan 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Steel Cable, PVC Handles',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=400&q=80'},
+    {id:'g5',brand:'Fitkit',name:'Yoga Mat Anti-Slip 6mm',price:799,weight:'0.9kg',flavors:'–',protein:'–',servings:'–',mfg:'Feb 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'NBR Foam',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=400&q=80'},
+    {id:'g6',brand:'JerkFit',name:'Pull Up Bar Doorframe',price:1499,weight:'2.5kg',flavors:'–',protein:'–',servings:'–',mfg:'Mar 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Chrome-plated Steel',rating:'4.1⭐',img:'https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?w=400&q=80'},
+    {id:'g7',brand:'Konex',name:'Kettlebell Cast Iron 8kg',price:1899,weight:'8kg',flavors:'–',protein:'–',servings:'–',mfg:'Jan 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Cast Iron',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1620188467120-5042ed1eb5da?w=400&q=80'},
+    {id:'g8',brand:'Strauss',name:'Ab Roller Wheel with Knee Pad',price:549,weight:'0.6kg',flavors:'–',protein:'–',servings:'–',mfg:'Feb 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'ABS Plastic, Foam Handles',rating:'4.2⭐',img:'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80'},
+    {id:'g9',brand:'Boldfit',name:'Gym Gloves Leather Grip',price:349,weight:'0.2kg',flavors:'–',protein:'–',servings:'–',mfg:'Mar 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Split Leather, Wrist Strap',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1545346315-f4c47e3e1b55?w=400&q=80'},
+    {id:'g10',brand:'Nike',name:'Dri-FIT Training T-Shirt',price:1499,weight:'0.25kg',flavors:'–',protein:'–',servings:'–',mfg:'Jan 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Polyester Dri-FIT fabric',rating:'4.6⭐',img:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80'},
+    {id:'g11',brand:'Kore',name:'Hex Dumbbell Rubber 5kg Pair',price:899,weight:'10kg',flavors:'–',protein:'–',servings:'–',mfg:'Feb 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Rubber Coated Cast Iron',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=400&q=80'},
+    {id:'g12',brand:'Aurion',name:'Foam Roller Deep Tissue 30cm',price:599,weight:'0.7kg',flavors:'–',protein:'–',servings:'–',mfg:'Mar 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'EPP High-density Foam',rating:'4.1⭐',img:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80'},
+    {id:'g13',brand:'Generic',name:'Pull-up Resistance Assist Band',price:699,weight:'0.4kg',flavors:'–',protein:'–',servings:'–',mfg:'Jan 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Natural Latex, Heavy-duty',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&q=80'},
+    {id:'g14',brand:'Fitkit',name:'Weight Training Belt Leather',price:1299,weight:'0.8kg',flavors:'–',protein:'–',servings:'–',mfg:'Feb 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Genuine Leather, Steel Buckle',rating:'4.5⭐',img:'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80'},
+    {id:'g15',brand:'Strauss',name:'Medicine Ball 3kg Dual Grip',price:1099,weight:'3kg',flavors:'–',protein:'–',servings:'–',mfg:'Mar 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Textured Rubber',rating:'4.2⭐',img:'https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?w=400&q=80'},
+    {id:'g16',brand:'Boldfit',name:'Wrist Roller Forearm Trainer',price:399,weight:'0.5kg',flavors:'–',protein:'–',servings:'–',mfg:'Jan 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Steel Rod, Neoprene Handles',rating:'4.0⭐',img:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80'},
+    {id:'g17',brand:'Konex',name:'Olympic Barbell 7ft 20kg',price:4999,weight:'20kg',flavors:'–',protein:'–',servings:'–',mfg:'Feb 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Alloy Steel, Chrome Finish',rating:'4.6⭐',img:'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&q=80'},
+    {id:'g18',brand:'JerkFit',name:'Gymnastic Rings Wooden',price:1899,weight:'1.2kg',flavors:'–',protein:'–',servings:'–',mfg:'Mar 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Birch Wood, Nylon Straps',rating:'4.4⭐',img:'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=400&q=80'},
+    {id:'g19',brand:'Strauss',name:'Speed Agility Ladder 10m',price:799,weight:'0.8kg',flavors:'–',protein:'–',servings:'–',mfg:'Jan 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Nylon Rungs, Polypropylene Straps',rating:'4.1⭐',img:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80'},
+    {id:'g20',brand:'Fitkit',name:'Cooling Towel Instant Cool',price:299,weight:'0.2kg',flavors:'–',protein:'–',servings:'–',mfg:'Feb 2025',expiry:'N/A',country:'India',calories:'–',ingredients:'Polyvinyl Alcohol Fabric',rating:'4.3⭐',img:'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=400&q=80'},
+  ]
+};
+
+// ============================================================
+//  STATE
+// ============================================================
+let currentPage = 'page-splash';
+let currentCategory = null;  // 'supplements' or 'workout'
+let currentType = null;      // 'whey','creatine',etc
+let currentProduct = null;
+let pendingAddress = null;
+
+// ============================================================
+//  NAVIGATION
+// ============================================================
+function goto(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  currentPage = id;
+  window.scrollTo(0,0);
+  updateAllCartCounts();
+  if(id==='page-home') renderHomeUser();
+  if(id==='page-cart') renderCart();
+  if(id==='page-profile') renderProfile();
+  if(id==='page-payment') renderPayment();
+}
+
+// ============================================================
+//  AUTH
+// ============================================================
+function doRegister(){
+  const u=v('reg-username'),e=v('reg-email'),ph=v('reg-phone'),p=v('reg-pwd'),dob=v('reg-dob'),g=v('reg-gender');
+  if(!u||!e||!p){showAlert('reg-alert','Please fill all required fields.');return;}
+  if(p.length<6){showAlert('reg-alert','Password must be at least 6 characters.');return;}
+  const users=DB.getUsers();
+  if(users.find(x=>x.username===u||x.email===e)){showAlert('reg-alert','Username or email already exists.');return;}
+  const newUser={id:'u'+Date.now(),username:u,email:e,phone:ph,password:p,dob,gender:g,createdAt:new Date().toLocaleDateString(),memberType:'Standard',loyaltyPoints:0,preferredCategories:'Supplements',savedPayment:'None'};
+  users.push(newUser);DB.saveUsers(users);
+  showToast('Account created! Please login.');
+  goto('page-login');
+}
+
+function doLogin(){
+  const id=v('login-id'),p=v('login-pwd');
+  if(!id||!p){showAlert('login-alert','Please enter credentials.');return;}
+  const users=DB.getUsers();
+  const user=users.find(x=>(x.username===id||x.email===id||x.phone===id)&&x.password===p);
+  if(!user){showAlert('login-alert','Incorrect username/email or password.');return;}
+  DB.setCurrentUser(user);
+  showToast('Welcome back, '+user.username+'!');
+  goto('page-home');
+}
+
+function guestLogin(){
+  DB.setCurrentUser({id:'guest',username:'Guest',email:'–',phone:'–',memberType:'Guest',loyaltyPoints:0,gender:'–',dob:'–',createdAt:'–',preferredCategories:'–',savedPayment:'None'});
+  goto('page-home');
+}
+
+// ============================================================
+//  HOME
+// ============================================================
+function renderHomeUser(){
+  const u=DB.getCurrentUser()||{username:'?'};
+  const av=document.getElementById('header-avatar');
+  const nm=document.getElementById('header-name');
+  if(av) av.textContent=u.username[0].toUpperCase();
+  if(nm) nm.textContent=u.username;
+}
+
+function openCategory(cat){
+  currentCategory=cat;
+  if(cat==='supplements'){
+    // Show supplement types
+    document.getElementById('types-breadcrumb').textContent='Supplements';
+    document.getElementById('types-title').textContent='SUPPLEMENTS';
+    const grid=document.getElementById('types-grid');
+    grid.innerHTML=SUPPLEMENT_TYPES.map(t=>`
+      <div class="type-card" onclick="openType('${t.id}')">
+        <div class="type-icon">${t.icon}</div>
+        <h3>${t.name}</h3>
+        <p>${t.desc}</p>
+      </div>
+    `).join('');
+    goto('page-types');
+  } else {
+    // Workout – go direct to products
+    openWorkout();
+  }
+}
+
+function openType(typeId){
+  currentType=typeId;
+  const type=SUPPLEMENT_TYPES.find(t=>t.id===typeId);
+  document.getElementById('prod-breadcrumb').innerHTML=`Home → Supplements → <span>${type.name}</span>`;
+  document.getElementById('prod-title').textContent=type.name.toUpperCase();
+  document.getElementById('prod-back-btn').onclick=()=>goto('page-types');
+  renderProducts(PRODUCTS[typeId]||[]);
+  goto('page-products');
+}
+
+function openWorkout(){
+  document.getElementById('prod-breadcrumb').innerHTML=`Home → <span>Workout Gear</span>`;
+  document.getElementById('prod-title').textContent='WORKOUT GEAR';
+  document.getElementById('prod-back-btn').onclick=()=>goto('page-home');
+  renderProducts(PRODUCTS.workout);
+  currentType='workout';
+  goto('page-products');
+}
+
+function renderProducts(items){
+  const grid=document.getElementById('products-grid');
+  grid.innerHTML=items.map(p=>`
+    <div class="product-card" onclick="openDetail('${p.id}')">
+      <div class="product-img"><img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80'"/></div>
+      <div class="product-info">
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-rating">${p.rating}</div>
+        <div class="product-price">₹${p.price.toLocaleString()}</div>
+        <div class="product-actions">
+          <button class="btn btn-red btn-sm" onclick="event.stopPropagation();buyNow('${p.id}')">Buy Now</button>
+          <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();addToCart('${p.id}')">+ Cart</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+//  PRODUCT DETAIL
+// ============================================================
+function findProduct(id){
+  for(const key of Object.keys(PRODUCTS)){
+    const p=PRODUCTS[key].find(x=>x.id===id);
+    if(p) return p;
+  }return null;
+}
+
+function openDetail(id){
+  currentProduct=findProduct(id);
+  if(!currentProduct)return;
+  const p=currentProduct;
+  // breadcrumb back
+  document.getElementById('det-back-btn').onclick=()=>goto('page-products');
+  document.getElementById('det-breadcrumb').innerHTML=`<span>${p.brand}</span> → ${p.name}`;
+  document.getElementById('detail-content').innerHTML=`
+    <div class="detail-layout">
+      <div class="detail-img-wrap">
+        <img src="${p.img}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80'"/>
+      </div>
+      <div>
+        <div class="detail-brand">${p.brand}</div>
+        <h1>${p.name}</h1>
+        <div class="detail-price">₹${p.price.toLocaleString()}</div>
+        <div>${p.rating}</div>
+        <div style="margin:8px 0 20px">${['Authentic','Lab Tested','Best Price','Fast Delivery'].map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div class="detail-specs">
+          ${specRow('Weight / Size',p.weight)}
+          ${specRow('Flavors Available',p.flavors)}
+          ${specRow('Protein Per Serving',p.protein)}
+          ${specRow('Number of Servings',p.servings)}
+          ${specRow('Calories Per Serving',p.calories)}
+          ${specRow('Manufacture Date',p.mfg)}
+          ${specRow('Expiry Date',p.expiry)}
+          ${specRow('Country of Origin',p.country)}
+          ${specRow('Key Ingredients',p.ingredients)}
+          ${specRow('Rating',p.rating)}
+        </div>
+        <div class="detail-btns">
+          <button class="btn btn-red" onclick="buyNow('${p.id}')">⚡ BUY NOW</button>
+          <button class="btn btn-outline" onclick="addToCart('${p.id}')">+ ADD TO CART</button>
+        </div>
+      </div>
+    </div>
+  `;
+  goto('page-detail');
+}
+
+function specRow(label,val){
+  return `<div class="spec-row"><span class="label">${label}</span><span>${val||'–'}</span></div>`;
+}
+
+// ============================================================
+//  CART
+// ============================================================
+function addToCart(id){
+  const p=findProduct(id);if(!p)return;
+  const cart=DB.getCart();
+  const ex=cart.find(x=>x.id===id);
+  if(ex){ex.qty++;} else {cart.push({...p,qty:1});}
+  DB.saveCart(cart);
+  updateAllCartCounts();
+  showToast(p.name+' added to cart!');
+}
+
+function removeFromCart(id){
+  let cart=DB.getCart().filter(x=>x.id!==id);
+  DB.saveCart(cart);renderCart();updateAllCartCounts();
+}
+
+function updateQty(id,delta){
+  const cart=DB.getCart();
+  const item=cart.find(x=>x.id===id);
+  if(!item)return;
+  item.qty+=delta;
+  if(item.qty<=0){DB.saveCart(cart.filter(x=>x.id!==id));}
+  else{DB.saveCart(cart);}
+  renderCart();updateAllCartCounts();
+}
+
+function updateAllCartCounts(){
+  const n=DB.getCart().reduce((s,x)=>s+x.qty,0);
+  document.querySelectorAll('.cart-count').forEach(el=>el.textContent=n);
+}
+
+function renderCart(){
+  const cart=DB.getCart();
+  const itemsEl=document.getElementById('cart-items');
+  const summEl=document.getElementById('cart-summary');
+  if(!itemsEl)return;
+  if(cart.length===0){
+    itemsEl.innerHTML=`<div class="empty-state"><div class="icon">🛒</div><h3>Your cart is empty</h3><p>Add some products to get started</p><button class="btn btn-red" style="margin-top:20px" onclick="goto('page-home')">SHOP NOW</button></div>`;
+    summEl.innerHTML='';return;
+  }
+  itemsEl.innerHTML=cart.map(item=>`
+    <div class="cart-item">
+      <div class="cart-item-img"><img src="${item.img}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80'"/></div>
+      <div class="cart-item-info">
+        <div class="cart-item-brand">${item.brand}</div>
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">₹${(item.price*item.qty).toLocaleString()}</div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="updateQty('${item.id}',-1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="updateQty('${item.id}',1)">+</button>
+          <button class="remove-btn" onclick="removeFromCart('${item.id}')">Remove</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  const sub=cart.reduce((s,x)=>s+x.price*x.qty,0);
+  const shipping=sub>2000?0:99;
+  const gst=Math.round(sub*0.18);
+  const total=sub+shipping+gst;
+  summEl.innerHTML=`
+    <div class="order-summary">
+      <h3>ORDER SUMMARY</h3>
+      <div class="summary-row"><span>Subtotal (${cart.length} items)</span><span>₹${sub.toLocaleString()}</span></div>
+      <div class="summary-row"><span>Shipping</span><span>${shipping===0?'FREE':'₹'+shipping}</span></div>
+      <div class="summary-row"><span>GST (18%)</span><span>₹${gst.toLocaleString()}</span></div>
+      <div class="summary-row total"><span>TOTAL</span><span class="val">₹${total.toLocaleString()}</span></div>
+      <button class="btn btn-red btn-full" style="margin-top:20px" onclick="goto('page-address')">PROCEED TO CHECKOUT →</button>
+      <button class="btn btn-dark btn-full" style="margin-top:10px" onclick="goto('page-home')">CONTINUE SHOPPING</button>
+    </div>
+  `;
+}
+
+function buyNow(id){
+  addToCart(id);
+  goto('page-address');
+}
+
+// ============================================================
+//  CHECKOUT – ADDRESS
+// ============================================================
+function proceedToPayment(){
+  const n=v('addr-name'),ph=v('addr-phone'),l1=v('addr-line1'),city=v('addr-city'),state=v('addr-state'),pin=v('addr-pin');
+  if(!n||!ph||!l1||!city||!state||!pin){showAlert('addr-alert','Please fill all required address fields.');return;}
+  pendingAddress={name:n,phone:ph,line1:l1,line2:v('addr-line2'),city,state,pin,country:v('addr-country')||'India'};
+  DB.saveAddress(pendingAddress);
+  goto('page-payment');
+}
+
+// ============================================================
+//  CHECKOUT – PAYMENT
+// ============================================================
+function renderPayment(){
+  const cart=DB.getCart();
+  const sub=cart.reduce((s,x)=>s+x.price*x.qty,0);
+  const shipping=sub>2000?0:99;
+  const gst=Math.round(sub*0.18);
+  const total=sub+shipping+gst;
+  const txId='TXN'+Date.now();
+  const el=document.getElementById('payment-details');
+  if(!el)return;
+  el.innerHTML=`
+    <div class="payment-detail">
+      <div class="payment-row"><span class="label">Transaction ID</span><span>${txId}</span></div>
+      <div class="payment-row"><span class="label">Order Date</span><span>${new Date().toLocaleDateString('en-IN')}</span></div>
+      <div class="payment-row"><span class="label">Delivery To</span><span>${pendingAddress?pendingAddress.name+', '+pendingAddress.city:'–'}</span></div>
+      <div class="payment-row"><span class="label">Items</span><span>${cart.length} item(s)</span></div>
+      <div class="payment-row"><span class="label">Subtotal</span><span>₹${sub.toLocaleString()}</span></div>
+      <div class="payment-row"><span class="label">Shipping</span><span>${shipping===0?'FREE':'₹'+shipping}</span></div>
+      <div class="payment-row"><span class="label">GST (18%)</span><span>₹${gst.toLocaleString()}</span></div>
+      <div class="payment-row"><span class="label">Discount</span><span>₹0</span></div>
+      <div class="payment-row"><span class="label">Coupon</span><span>None Applied</span></div>
+      <div class="payment-row"><span class="label">Estimated Delivery</span><span>${estimateDelivery()}</span></div>
+    </div>
+    <div class="payment-total">TOTAL: ₹${total.toLocaleString()}</div>
+  `;
+  el.dataset.total=total;
+  el.dataset.txId=txId;
+}
+
+function estimateDelivery(){
+  const d=new Date();d.setDate(d.getDate()+Math.floor(3+Math.random()*3));
+  return d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short'});
+}
+
+function doPayment(){
+  const method=v('pay-method'),pid=v('pay-id');
+  if(!pid){showToast('Please enter payment details','error');return;}
+  const el=document.getElementById('payment-details');
+  const total=el?el.dataset.total:0;
+  const txId=el?el.dataset.txId:'TXN'+Date.now();
+  // Save order
+  const user=DB.getCurrentUser();
+  const cart=DB.getCart();
+  const orders=DB.getOrders();
+  orders.push({
+    orderId:'ORD'+Date.now(),txId,userId:user?user.id:'guest',
+    items:cart,total,address:pendingAddress,payMethod:method,
+    status:'Confirmed',date:new Date().toISOString()
+  });
+  DB.saveOrders(orders);
+  DB.saveCart([]);
+  updateAllCartCounts();
+  document.getElementById('success-msg').textContent=`Order #${txId} confirmed! Total paid: ₹${parseInt(total).toLocaleString()}. Estimated delivery: ${estimateDelivery()}.`;
+  goto('page-success');
+}
+
+// ============================================================
+//  PROFILE
+// ============================================================
+function renderProfile(){
+  const u=DB.getCurrentUser();
+  const orders=DB.getOrders().filter(o=>o.userId===(u?u.id:'guest'));
+  const addrs=DB.getSavedAddresses();
+  const el=document.getElementById('profile-content');
+  if(!el)return;
+  if(!u){el.innerHTML='<p style="color:var(--muted)">Not logged in.</p>';return;}
+
+  // update avatar
+  document.querySelectorAll('#prof-cart-count').forEach(e=>e.textContent=DB.getCart().reduce((s,x)=>s+x.qty,0));
+
+  el.innerHTML=`
+    <div class="profile-wrap" style="padding:0;max-width:900px">
+      <div class="profile-header">
+        <div class="profile-avatar">${u.username[0].toUpperCase()}</div>
+        <div>
+          <div class="profile-name">${u.username.toUpperCase()}</div>
+          <div class="profile-email">${u.email}</div>
+          <div style="margin-top:8px"><span class="tag">${u.memberType||'Standard'}</span></div>
+        </div>
+      </div>
+      <div class="profile-sections">
+        <div class="profile-section">
+          <h3>Account Details</h3>
+          ${pf('Username',u.username)}
+          ${pf('Email',u.email)}
+          ${pf('Phone',u.phone||'–')}
+          ${pf('Date of Birth',u.dob||'–')}
+          ${pf('Gender',u.gender||'–')}
+          ${pf('Member Since',u.createdAt||'–')}
+          ${pf('Member Type',u.memberType||'Standard')}
+          ${pf('Loyalty Points',u.loyaltyPoints||0)}
+          ${pf('Preferred Category',u.preferredCategories||'–')}
+          ${pf('Saved Payment',u.savedPayment||'None')}
+        </div>
+        <div class="profile-section">
+          <h3>Saved Addresses</h3>
+          ${addrs.length===0?'<p style="color:var(--muted);font-size:14px">No saved addresses</p>':addrs.map(a=>`<div style="background:#111;border:1px solid var(--border);padding:12px;border-radius:2px;margin-bottom:8px;font-size:13px;line-height:1.6">${a.name}<br/>${a.line1}, ${a.city}, ${a.state} ${a.pin}</div>`).join('')}
+        </div>
+      </div>
+      <div style="margin-top:24px">
+        <h3 style="font-family:var(--font-cond);font-size:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">My Orders (${orders.length})</h3>
+        ${orders.length===0?`<div class="empty-state" style="padding:40px"><div class="icon">📦</div><h3>No orders yet</h3><p>Start shopping to see your orders here</p></div>`:
+        `<div class="orders-list">${orders.map(o=>`
+          <div class="order-item">
+            <div>
+              <div class="order-id">#${o.orderId}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">${new Date(o.date).toLocaleDateString('en-IN')} · ${o.items.length} item(s) · ${o.payMethod}</div>
+              <div style="font-size:12px;color:var(--muted)">📍 ${o.address?o.address.city+', '+o.address.state:'–'}</div>
+            </div>
+            <div style="text-align:right">
+              <div class="order-badge">✓ ${o.status}</div>
+              <div class="order-total" style="margin-top:8px">₹${parseInt(o.total).toLocaleString()}</div>
+            </div>
+          </div>
+        `).join('')}</div>`}
+      </div>
+      <div style="margin-top:32px">
+        <button class="btn btn-dark" onclick="doLogout()">LOGOUT →</button>
+      </div>
+    </div>
+  `;
+}
+
+function pf(k,v){return`<div class="profile-field"><span class="key">${k}</span><span>${v}</span></div>`;}
+
+function doLogout(){
+  DB.clearCurrentUser();
+  goto('page-auth');
+  showToast('Logged out successfully.');
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
+function v(id){return(document.getElementById(id)||{}).value||'';}
+
+function showAlert(id,msg){
+  const el=document.getElementById(id);
+  if(el){el.textContent=msg;el.classList.add('show');}
+}
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(type==='error'?' error-toast':'');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+updateAllCartCounts();
+// Check if already logged in
+if(DB.getCurrentUser()) {
+  // Don't auto-redirect; let splash show
+}
+</script>
+</body>
+</html>
